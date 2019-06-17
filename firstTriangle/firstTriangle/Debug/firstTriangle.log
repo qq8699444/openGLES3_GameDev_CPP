@@ -1,3 +1,0 @@
-﻿  firstTriangle.cpp
-e:\异构计算\opengl\opengles3_note\firsttriangle\firsttriangle\firsttriangle.cpp(20): error C2664: “void glShaderSource(GLuint,GLsizei,const GLchar *const *,const GLint *)”: 无法将参数 3 从“const char *”转换为“const GLchar *const *”
-  e:\异构计算\opengl\opengles3_note\firsttriangle\firsttriangle\firsttriangle.cpp(20): note: 与指向的类型无关；强制转换要求 reinterpret_cast、C 样式强制转换或函数样式强制转换
