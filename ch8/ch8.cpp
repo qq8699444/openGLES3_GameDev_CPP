@@ -1,0 +1,301 @@
+// The MIT License (MIT)
+//
+// Copyright (c) 2013 Dan Ginsburg, Budirijanto Purnomo
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+//
+// Book:      OpenGL(R) ES 3.0 Programming Guide, 2nd Edition
+// Authors:   Dan Ginsburg, Budirijanto Purnomo, Dave Shreiner, Aaftab Munshi
+// ISBN-10:   0-321-93388-5
+// ISBN-13:   978-0-321-93388-1
+// Publisher: Addison-Wesley Professional
+// URLs:      http://www.opengles-book.com
+//            http://my.safaribooksonline.com/book/animation-and-3d/9780133440133
+//
+// Hello_Triangle.c
+//
+//    This is a simple example that draws a single triangle with
+//    a minimal vertex/fragment shader.  The purpose of this
+//    example is to demonstrate the basic concepts of
+//    OpenGL ES 3.0 rendering.
+#include "esUtil.h"
+#include "MatrixState.h"
+
+#define VERTEX_POS_SIZE       3 // x, y and z
+#define VERTEX_COLOR_SIZE     4 // r, g, b, and a
+
+#define VERTEX_POS_INDX       0
+#define VERTEX_COLOR_INDX     1
+
+typedef struct
+{
+   // Handle to a program object
+   GLuint programObject;
+
+   //vertex attri
+   GLfloat  *vertices;
+   GLuint   *indices;
+   int numIndices;
+
+   //
+   GLint    mvpLoc;
+
+   //
+   GLfloat  angle;
+   ESMatrix  mvpMatrix;
+} UserData;
+
+///
+// Create a shader object, load the shader source, and
+// compile the shader.
+//
+GLuint LoadShader ( GLenum type, const char *shaderSrc )
+{
+   GLuint shader;
+   GLint compiled;
+
+   // Create the shader object
+   shader = glCreateShader ( type );
+
+   if ( shader == 0 )
+   {
+      return 0;
+   }
+
+   // Load the shader source
+   glShaderSource ( shader, 1, &shaderSrc, NULL );
+
+   // Compile the shader
+   glCompileShader ( shader );
+
+   // Check the compile status
+   glGetShaderiv ( shader, GL_COMPILE_STATUS, &compiled );
+
+   if ( !compiled )
+   {
+      GLint infoLen = 0;
+
+      glGetShaderiv ( shader, GL_INFO_LOG_LENGTH, &infoLen );
+
+      if ( infoLen > 1 )
+      {
+         char *infoLog = new char[infoLen];
+
+         glGetShaderInfoLog ( shader, infoLen, NULL, infoLog );
+         esLogMessage ( "Error compiling shader:\n%s\n", infoLog );
+
+		 delete[] infoLog;
+      }
+
+      glDeleteShader ( shader );
+      return 0;
+   }
+
+   return shader;
+
+}
+
+///
+// Initialize the shader and program object
+//
+int Init ( ESContext *esContext )
+{
+   UserData *userData = (UserData *)esContext->userData;
+   const char vShaderStr[] =
+	   "#version 300 es                            \n"
+       "uniform mat4 u_mvpMatrix;                  \n"
+	   "layout(location = 0) in vec4 a_position;   \n"
+	   "layout(location = 1) in vec4 a_color;      \n"
+	   "out vec4 v_color;                          \n"
+	   "void main()                                \n"
+	   "{                                          \n"
+	   "    v_color = a_color;                     \n"
+	   "    gl_Position = u_mvpMatrix * a_position;              \n"
+	   "}";
+
+
+   const char fShaderStr[] =
+	   "#version 300 es            \n"
+	   "precision mediump float;   \n"
+	   "in vec4 v_color;           \n"
+	   "out vec4 o_fragColor;      \n"
+	   "void main()                \n"
+	   "{                          \n"
+	   "    o_fragColor = v_color; \n"
+	   "}";
+
+   GLuint vertexShader;
+   GLuint fragmentShader;
+   GLuint programObject;
+   GLint linked;
+
+   // Load the vertex/fragment shaders
+   vertexShader = LoadShader ( GL_VERTEX_SHADER, vShaderStr );
+   fragmentShader = LoadShader ( GL_FRAGMENT_SHADER, fShaderStr );
+
+   // Create the program object
+   programObject = glCreateProgram ( );
+
+   if ( programObject == 0 )
+   {
+      return 0;
+   }
+
+   glAttachShader ( programObject, vertexShader );
+   glAttachShader ( programObject, fragmentShader );
+
+   // Link the program
+   glLinkProgram ( programObject );
+
+   // Check the link status
+   glGetProgramiv ( programObject, GL_LINK_STATUS, &linked );
+
+   if ( !linked )
+   {
+      GLint infoLen = 0;
+
+      glGetProgramiv ( programObject, GL_INFO_LOG_LENGTH, &infoLen );
+
+      if ( infoLen > 1 )
+      {
+         char *infoLog = new char[ infoLen ];
+
+         glGetProgramInfoLog ( programObject, infoLen, NULL, infoLog );
+         esLogMessage ( "Error linking program:\n%s\n", infoLog );
+
+         delete [] infoLog;
+      }
+
+      glDeleteProgram ( programObject );
+      return FALSE;
+   }
+
+   // Store the program object
+   userData->programObject = programObject;
+   userData->mvpLoc = glGetUniformLocation(programObject, "u_mvpMatrix");
+
+   userData->numIndices = esGenCube(1.0, &userData->vertices, nullptr, nullptr, &userData->indices);
+   userData->angle = 45.0f;
+
+
+   glClearColor ( 1.0f, 1.0f, 1.0f, 0.0f );
+   esMatrixLoadIdentity(&userData->mvpMatrix);
+   MatrixState::testglm();
+   return TRUE;
+}
+
+void Update(ESContext *esContext, float deltaTime)
+{
+    UserData *userData = (UserData *)esContext->userData;
+    ESMatrix perspective;
+    ESMatrix modelview;
+    float    aspect;
+
+    //
+    userData->angle += (deltaTime * 40.0f);
+
+    if (userData->angle >= 360.0f)
+    {
+        userData->angle -= 360.0f;
+    }
+
+    //
+    aspect = (GLfloat)esContext->width / (GLfloat)esContext->height;
+
+    //
+    esMatrixLoadIdentity(&modelview);
+    esTranslate(&modelview, 0.0f, 0.0f, -2.0f);
+    esRotate(&modelview, userData->angle, 1.0, 0.0, 1.0);
+    
+    //
+    esMatrixLoadIdentity(&perspective);
+    esPerspective(&perspective, 60.0f, aspect, 1.0f, 20.0f);
+
+
+    //
+    esMatrixMultiply(&userData->mvpMatrix, &modelview, &perspective);
+}
+
+///
+// Draw a triangle using the shader pair created in Init()
+//
+void Draw ( ESContext *esContext )
+{
+   UserData *userData = (UserData *)esContext->userData;
+   
+   
+
+   // Set the viewport
+   glViewport ( 0, 0, esContext->width, esContext->height );
+
+   // Clear the color buffer
+   glClear ( GL_COLOR_BUFFER_BIT );
+
+   // Use the program object
+   glUseProgram ( userData->programObject );
+
+   //
+   glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, userData->vertices);
+   glEnableVertexAttribArray(0);
+
+   //
+   glVertexAttrib4f(1, 1.0f, 0.0f, 0.0f, 1.0f);
+
+   //
+   glUniformMatrix4fv(userData->mvpLoc, 1, false,  &userData->mvpMatrix.m[0][0]);
+
+   // Load the vertex data
+   glDrawElements(GL_TRIANGLES, userData->numIndices, GL_UNSIGNED_INT, userData->indices);
+}
+
+void Shutdown ( ESContext *esContext )
+{
+   UserData *userData = (UserData *)esContext->userData;
+
+   glDeleteProgram ( userData->programObject );
+   if (userData->vertices)
+   {
+       free(userData->vertices);
+   }
+
+   if (userData->indices)
+   {
+       free(userData->indices);
+   }
+   free(userData);
+}
+extern "C" int esMain ( ESContext *esContext )
+{
+   esContext->userData = malloc ( sizeof ( UserData ) );
+   memset(esContext->userData, 0, sizeof(UserData));
+
+   esCreateWindow ( esContext, "Hello Triangle", 320, 240, ES_WINDOW_RGB );
+
+   if ( !Init ( esContext ) )
+   {
+      return GL_FALSE;
+   }
+
+   esRegisterShutdownFunc ( esContext, Shutdown );
+   esRegisterUpdateFunc(esContext, Update);
+   esRegisterDrawFunc ( esContext, Draw );
+
+   return GL_TRUE;
+}

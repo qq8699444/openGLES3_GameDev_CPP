@@ -1,0 +1,83 @@
+#pragma once
+#include <stack>
+#include "MatrixHelper.h"
+#include <glm/glm.hpp>
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
+#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
+#include <glm/ext.hpp> // glm::pi
+
+#define USE_GLM
+//#undef USE_GLM
+
+class MatrixState
+{
+public:
+    MatrixState();
+    ~MatrixState();
+
+    static void setInitStack();
+    static void translate(float x, float y, float z);
+    static void rotate(float angle, float x, float y, float z);
+
+    //
+    static void pushMatrix();
+    static void popMatrix();
+    //
+    static void testglm();
+    //
+    static const float* getFinalMatrix();
+
+    //
+    
+
+    static void setperspective
+    (
+        float fovy,
+        float aspect,
+        float znear,	//near面距离
+        float zfar //far面距离
+    );
+    
+
+    static void setCamera
+    (
+        float cx,	//摄像机位置x
+        float cy, //摄像机位置y
+        float cz, //摄像机位置z
+        float tx, //摄像机目标点x
+        float ty, //摄像机目标点y
+        float tz, //摄像机目标点z
+        float upx, //摄像机UP向量X分量
+        float upy, //摄像机UP向量Y分量
+        float upz //摄像机UP向量Z分量  
+    );
+    
+
+private:
+#ifdef USE_GLM
+    static glm::mat4 mProjMatrix;
+    static glm::mat4 mVMatrix;
+    static glm::mat4 currMatrix;
+
+    //stack
+    static glm::mat4 mStack[16];
+    static int stackTop;
+
+    //
+    static glm::mat4 mMVPMatrix;
+#else
+    static GLMatrix mProjMatrix;
+    static GLMatrix mVMatrix;
+    static GLMatrix currMatrix;
+
+    //stack
+    static GLMatrix mStack[16];
+    static int stackTop;
+
+    //
+    static GLMatrix mMVPMatrix;
+#endif
+};
