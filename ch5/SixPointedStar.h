@@ -22,6 +22,8 @@ public:
     void decyAngle() {
         yAngle -= 10.f;
     }
+
+    void testVert();
 protected:
 private:
     std::string mVertexShader;

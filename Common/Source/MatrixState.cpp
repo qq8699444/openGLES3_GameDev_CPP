@@ -46,7 +46,7 @@ void MatrixState::setInitStack()
 void MatrixState::translate(float x, float y, float z)
 {
 #ifdef USE_GLM
-    glm::translate(currMatrix, glm::vec3(x, y, z));
+    currMatrix = glm::translate(currMatrix, glm::vec3(x, y, z));
 #else
     translateM(currMatrix, 0, x, y, z);
     #endif
@@ -55,7 +55,7 @@ void MatrixState::translate(float x, float y, float z)
 void MatrixState::rotate(float angle, float x, float y, float z)
 {
 #ifdef USE_GLM
-    glm::rotate(currMatrix, angle, glm::vec3(x, y, z));
+    currMatrix = glm::rotate(currMatrix, glm::radians(angle), glm::vec3(x, y, z));
 #else
     rotateM(currMatrix, angle, x, y, z);
 #endif
@@ -94,7 +94,7 @@ const float* MatrixState::getFinalMatrix()
     float* ptr = glm::value_ptr(mMVPMatrix);
     for (int i = 0; i < 4; i++)
     {
-        printf("%f %f %f %f\n", ptr[i], ptr[i + 1], ptr[i + 2], ptr[i + 3]);
+        //printf("%f %f %f %f\n", ptr[i], ptr[i + 1], ptr[i + 2], ptr[i + 3]);
     }
     
     return glm::value_ptr(mMVPMatrix);
@@ -156,6 +156,39 @@ void MatrixState::setperspective
     perspectiveM(mProjMatrix, 0, fovy, aspect, znear, zfar);
 #endif
 }
+
+void MatrixState::setProjectFrustum(
+    float left, // near面的left
+    float right, // near面的right
+    float bottom, // near面的bottom
+    float top, // near面的top
+    float znear, // near面与视点的距离
+    float zfar // far面与视点的距离
+)
+{
+#ifdef USE_GLM
+    mProjMatrix = glm::frustum(left, right, bottom, top, znear, zfar);
+#else
+    frustumM(mProjMatrix, 0, left, right, bottom, top, znear, zfar);
+#endif
+}
+
+void MatrixState::setProjectOrtho(
+    float left,
+    float right,
+    float bottom,
+    float top,
+    float znear,
+    float zfar
+)
+{
+#ifdef USE_GLM
+    mProjMatrix = glm::ortho(left, right, bottom, top, znear, zfar);
+#else    
+    orthoM(mProjMatrix, 0, left, right, bottom, top, znear, zfar);
+#endif
+}
+
 void MatrixState::testglm()
 {
     //glm::mat4 m1 = glm::ortho(3.0f, 5.0f, 1.0f, 3.0f, 3.0f, 7.0f);

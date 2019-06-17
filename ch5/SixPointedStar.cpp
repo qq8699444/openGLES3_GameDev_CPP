@@ -58,6 +58,7 @@ void SixPointedStar::initVertexData(float R, float r, float z)
     }
 
     vCount = VertexList.size()/3;
+
     for (int i = 0;i < vCount; i++)
     {
         if (i % 3 == 0) {//
@@ -92,26 +93,47 @@ void SixPointedStar::drawSelf()
 {
     glUseProgram(mProgram);
 
-    //Matrix.setRotateM(mMMatrix, 0, 0, 0, 1, 0);
-    esMatrixLoadIdentity(&matrix);
+    {
+        MatrixState::pushMatrix();
+        //Matrix.setRotateM(mMMatrix, 0, 0, 0, 1, 0);
+        //esMatrixLoadIdentity(&matrix);
+    
 
-    //Matrix.translateM(mMMatrix, 0, 0, 0, 1);
-    //esTranslate(&matrix, 0, 0, 0.9);
+        //Matrix.translateM(mMMatrix, 0, 0, 0, 1);
+        MatrixState::translate(0, 0, 1);
 
-    //Matrix.rotateM(mMMatrix, 0, yAngle, 0, 1, 0);
-    esRotate(&matrix, yAngle, 0, 1, 0);
+        //Matrix.rotateM(mMMatrix, 0, yAngle, 0, 1, 0);
+        MatrixState::rotate(yAngle, 0, 1, 0);
 
-    //Matrix.rotateM(mMMatrix, 0, xAngle, 1, 0, 0);
-    esRotate(&matrix, xAngle, 1, 0, 0);
+        //Matrix.rotateM(mMMatrix, 0, xAngle, 1, 0, 0);
+        MatrixState::rotate(xAngle, 1, 0, 0);
 
-    auto retMat = MatrixState::getFinalMatrix();
+        auto retMat = MatrixState::getFinalMatrix();
+        //testVert();
+        glUniformMatrix4fv(muMVPMatrixHandle, 1, false, (const GLfloat*)retMat);
+
+        MatrixState::popMatrix();
+    }
+    
+
     glVertexAttribPointer(maPositionHandle, 3, GL_FLOAT, false, 3 * sizeof(float), VertexList.data());
     glVertexAttribPointer(maColorHandle, 3, GL_FLOAT, false, 4 * sizeof(float), colorList.data());
 
-    glUniformMatrix4fv(muMVPMatrixHandle, 1, false, (const GLfloat*)retMat);
+    
 
     glEnableVertexAttribArray(maPositionHandle);
     glEnableVertexAttribArray(maColorHandle);
 
     glDrawArrays(GL_TRIANGLES, 0, vCount);
+}
+
+void SixPointedStar::testVert()
+{
+    for (int i = 0; i < vCount; i++)
+    {
+        glm::vec4   vert(VertexList[3 * i], VertexList[3 * i + 1], VertexList[3 * i + 2], 1.0f);
+        glm::vec4   ret = MatrixState::mMVPMatrix * vert;
+        float* pt = glm::value_ptr(ret);
+        printf("%f %f %f %f\n", pt[0], pt[1], pt[2], pt[3]);
+    }
 }

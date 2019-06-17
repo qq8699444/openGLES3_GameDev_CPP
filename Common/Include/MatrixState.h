@@ -42,7 +42,22 @@ public:
         float zfar //far面距离
     );
     
-
+    static void setProjectFrustum(
+        float left, // near面的left
+        float right, // near面的right
+        float bottom, // near面的bottom
+        float top, // near面的top
+        float znear, // near面与视点的距离
+        float zfar // far面与视点的距离
+    );
+    static void setProjectOrtho(
+        float left,
+        float right,
+        float bottom,
+        float top,
+        float znear,
+        float zfar
+    );
     static void setCamera
     (
         float cx,	//摄像机位置x
@@ -57,7 +72,7 @@ public:
     );
     
 
-private:
+public:
 #ifdef USE_GLM
     static glm::mat4 mProjMatrix;
     static glm::mat4 mVMatrix;

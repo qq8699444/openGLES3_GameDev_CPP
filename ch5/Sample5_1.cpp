@@ -43,8 +43,8 @@
 #include "SixPointedStar.h"
 #include "MatrixState.h"
 
-const int WIDTH = 240;
-const int HEIGHT = 320 ;
+const int WIDTH = 640;
+const int HEIGHT = 480 ;
 const int STAR_CNT = 6;
 typedef struct
 {
@@ -119,14 +119,25 @@ int Init ( ESContext *esContext )
     }
 
    UserData *userData = (UserData *)esContext->userData;
+
+   //
+   MatrixState::setInitStack();
+   //onSurfaceCreated
+   glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
    for (int i=0; i < STAR_CNT;i++)
    {
        userData->stars.push_back(std::make_shared<SixPointedStar>(0.2f, 0.5f, -0.3f*i));
    }
-   //userData->star = new SixPointedStar(0.2,0.5,1);
+
+   //打开深度检测
+   glEnable(GL_DEPTH_TEST);
    
+
+   //onSurfaceChanged
+   //设置视口的大小及位置 
+   glViewport(0, 0, WIDTH, HEIGHT);
    float  r = (float)WIDTH / HEIGHT;
-   //MatrixState::setProjectOrtho(-r, r, -1, 1, 1, 10);
+   MatrixState::setProjectOrtho(-r, r, -1, 1, 1, 10);
 
    MatrixState::setCamera(
        0, 0, 3.f,
@@ -135,7 +146,7 @@ int Init ( ESContext *esContext )
    );
 
    glViewport(0, 0, WIDTH, HEIGHT);
-   glClearColor ( 0.5f, 0.5f, 0.5f, 0.7f );
+   
    glEnable(GL_DEPTH_TEST);
    return TRUE;
 }
@@ -151,7 +162,6 @@ void Draw ( ESContext *esContext )
    {
        star->drawSelf();
    }
-   //userData->star->drawSelf();
 }
 
 void Shutdown ( ESContext *esContext )
