@@ -22,7 +22,7 @@ public:
     static void setInitStack();
     static void translate(float x, float y, float z);
     static void rotate(float angle, float x, float y, float z);
-
+    static void scale(float x, float y, float z);
     //
     static void pushMatrix();
     static void popMatrix();
@@ -38,17 +38,17 @@ public:
     (
         float fovy,
         float aspect,
-        float znear,	//nearÃæ¾àÀë
-        float zfar //farÃæ¾àÀë
+        float znear,	//nearé¢è·ç¦»
+        float zfar //faré¢è·ç¦»
     );
     
     static void setProjectFrustum(
-        float left, // nearÃæµÄleft
-        float right, // nearÃæµÄright
-        float bottom, // nearÃæµÄbottom
-        float top, // nearÃæµÄtop
-        float znear, // nearÃæÓëÊÓµãµÄ¾àÀë
-        float zfar // farÃæÓëÊÓµãµÄ¾àÀë
+        float left, // nearé¢çš„left
+        float right, // nearé¢çš„right
+        float bottom, // nearé¢çš„bottom
+        float top, // nearé¢çš„top
+        float znear, // nearé¢ä¸è§†ç‚¹çš„è·ç¦»
+        float zfar // faré¢ä¸è§†ç‚¹çš„è·ç¦»
     );
     static void setProjectOrtho(
         float left,
@@ -60,15 +60,15 @@ public:
     );
     static void setCamera
     (
-        float cx,	//ÉãÏñ»úÎ»ÖÃx
-        float cy, //ÉãÏñ»úÎ»ÖÃy
-        float cz, //ÉãÏñ»úÎ»ÖÃz
-        float tx, //ÉãÏñ»úÄ¿±êµãx
-        float ty, //ÉãÏñ»úÄ¿±êµãy
-        float tz, //ÉãÏñ»úÄ¿±êµãz
-        float upx, //ÉãÏñ»úUPÏòÁ¿X·ÖÁ¿
-        float upy, //ÉãÏñ»úUPÏòÁ¿Y·ÖÁ¿
-        float upz //ÉãÏñ»úUPÏòÁ¿Z·ÖÁ¿  
+        float cx,	//æ‘„åƒæœºä½ç½®x
+        float cy, //æ‘„åƒæœºä½ç½®y
+        float cz, //æ‘„åƒæœºä½ç½®z
+        float tx, //æ‘„åƒæœºç›®æ ‡ç‚¹x
+        float ty, //æ‘„åƒæœºç›®æ ‡ç‚¹y
+        float tz, //æ‘„åƒæœºç›®æ ‡ç‚¹z
+        float upx, //æ‘„åƒæœºUPå‘é‡Xåˆ†é‡
+        float upy, //æ‘„åƒæœºUPå‘é‡Yåˆ†é‡
+        float upz //æ‘„åƒæœºUPå‘é‡Zåˆ†é‡  
     );
     
 
