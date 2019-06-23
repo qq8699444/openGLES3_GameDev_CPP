@@ -4,6 +4,7 @@ set ( common_src Source/esShader.c
                  Source/esUtil.c
 				 Source/MatrixHelper.cpp
 				 Source/ShaderUtil.cpp
+				 Source/objLoaderUtil.cpp
 				 Source/MatrixState.cpp)
 
 
