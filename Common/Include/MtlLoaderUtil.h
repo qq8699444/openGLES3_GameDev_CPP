@@ -1,4 +1,4 @@
-#pragma  once
+#pragma once
 #include <string>
 #include <map>
 #include <memory>
@@ -29,7 +29,7 @@ struct MtlData {
 class MtlLoaderUtil
 {
 public:
-    static std::map<std::string, std::shared_ptr<MtlData>>  load(std::string mtlfname)
+    static std::map<std::string, std::shared_ptr<MtlData>> load(std::string mtlfname)
     {
         std::map<std::string, std::shared_ptr<MtlData>> mtlDatas;
         // If the file is not a material file return false
@@ -38,8 +38,11 @@ public:
         std::fstream f(mtlfname.c_str());
 
         // If the file is not found return false
-        if (!f.is_open())
+        if (!f.is_open()) {
+            std::cerr << "fail to open " << mtlfname << std::endl;
             return mtlDatas;
+        }
+            
 
         std::shared_ptr<MtlData> currMtlData;
         std::string curline;
@@ -130,7 +133,7 @@ private:
 
     
     static Number3D readColor(std::fstream& f) {
-        Number3D    r;
+        Number3D r;
         f >> r.x >> r.y >> r.z;
         return r;
     }

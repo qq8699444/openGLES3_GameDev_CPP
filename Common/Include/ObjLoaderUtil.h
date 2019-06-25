@@ -1,15 +1,17 @@
-#pragma  once
+#pragma once
 #include <string>
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include "MtlLoaderUtil.h"
+
 
 
 struct ObjData
 {
 public:
     std::string name;
-    MtlData mtlData;
+    std::string materialname;
 
     std::vector<int> aVertices;
     std::vector<int> aTexCoords;
@@ -28,43 +30,52 @@ public:
 class ObjLoaderUtil
 {
 public:
-    static std::vector<ObjData>  load(std::string objfile)
+    static std::vector<ObjData> load(std::string objfile, 
+                        std::vector<float>& vertices,
+                        std::vector<float>& texCoords,
+                        std::vector<float>& normals,
+                        std::map<std::string, std::shared_ptr<MtlData>>& materials
+    )
     {
         bool first = true;
         std::fstream f(objfile.c_str());
-        std::string tmp;
-
-        std::vector<float>  vertices;
-        std::vector<float>  texCoords;
-        std::vector<float>  normals;
-
+      
         ObjData currObjData;
         std::string currMaterialName = "";
         bool currObjHasFaces = false;
 
-        std::vector<ObjData>    objs;
+        std::vector<ObjData> objs;
         if (f)
         {
             while (f.eof() != true)
             {
+                std::string tmp;
                 f >> tmp;
 
                 if (tmp == V)
                     readVertices(f, vertices);
-                if (tmp == VT)
+                else if (tmp == VT)
                     readTexC(f, texCoords);
-                if (tmp == VN)
+                else if (tmp == VN)
                     readNormal(f, normals);
-                if (tmp == FACE)
+                else if (tmp == FACE)
                 {
                     readFaces(f,currObjData);
                     currObjHasFaces = true;
                 }
-                else if (tmp == MTLLIB)
-                    readMtl(f);
-                if (tmp == "g")
-                    readGroup(f);
-                else if (tmp == O)
+                else if (tmp == MTLLIB) 
+                {
+                    materials = readMtl(f);
+                }
+                else if (tmp == USEMTL)
+                {
+                    readMaterialname(f, currObjData.materialname);
+                    if (materials.find(currObjData.materialname) == materials.end())
+                    {
+                        std::cerr << "warning: " << currObjData.materialname << " not exist!" << std::endl;
+                    }
+                }
+                else if (tmp == G || tmp == O)
                 {
                     std::string objname;
                     f >> objname;
@@ -88,7 +99,18 @@ public:
                     break;
             }
         }
+        else
+        {
+            std::cerr << "fail to open " << objfile << std::endl;
+        }
 
+        //last obj
+        if (currObjHasFaces)
+        {
+            objs.push_back(currObjData);
+            currObjData.reset();
+            currObjHasFaces = false;
+        }
         f.close();
         return objs;
     }
@@ -104,7 +126,7 @@ private:
         vertices.push_back(z);
     }
 
-    static void readTexC(std::fstream& f, std::vector<float>&  texCoords)
+    static void readTexC(std::fstream& f, std::vector<float>& texCoords)
     {
         float u, v;
         f >> u >> v;
@@ -112,7 +134,7 @@ private:
         texCoords.push_back(v);
     }
 
-    static void readNormal(std::fstream& f, std::vector<float>&  normals)
+    static void readNormal(std::fstream& f, std::vector<float>& normals)
     {
         float nx, ny, nz;
         f >> nx >> ny >> nz;
@@ -134,18 +156,17 @@ private:
             currobj.aNormals.push_back(lNormal-1);
         }
     }
-    static void readMtl(std::fstream& f)
+    static std::map<std::string, std::shared_ptr<MtlData>> readMtl(std::fstream& f)
     {
         std::string materialPath;
         f >> materialPath;
 
-        
+        return MtlLoaderUtil::load(materialPath);
     }
 
-    static void readGroup(std::fstream& f)
+    static void readMaterialname(std::fstream& f,std::string& materialname)
     {
-        std::string group;
-        f >> group;
+        f >> materialname;
     }
 
     static void reset()
