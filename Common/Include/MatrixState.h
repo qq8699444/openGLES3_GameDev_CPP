@@ -10,6 +10,8 @@
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
 #include <glm/ext.hpp> // glm::pi
 
+#define  toRadians(x)   (x*3.14159/180)
+
 #define USE_GLM
 //#undef USE_GLM
 
