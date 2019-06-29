@@ -40,7 +40,7 @@
 #include <iostream>
 #include "esUtil.h"
 #include "ShaderUtil.h"
-#include "SixPointedStar.h"
+#include "cube.h"
 #include "MatrixState.h"
 
 const int WIDTH = 640;
@@ -51,8 +51,7 @@ typedef struct
    // Handle to a program object
    //GLuint programObject;
     //SixPointedStar *star = nullptr;
-    std::vector<std::shared_ptr<SixPointedStar>> stars;
-    ESMatrix   matrix;
+    std::shared_ptr<Cube> cube;
 
 
 } UserData;
@@ -61,63 +60,14 @@ typedef struct
 // Create a shader object, load the shader source, and
 // compile the shader.
 //
-GLuint LoadShader ( GLenum type, const char *shaderSrc )
-{
-   GLuint shader;
-   GLint compiled;
 
-   // Create the shader object
-   shader = glCreateShader ( type );
-
-   if ( shader == 0 )
-   {
-      return 0;
-   }
-
-   // Load the shader source
-   glShaderSource ( shader, 1, &shaderSrc, NULL );
-
-   // Compile the shader
-   glCompileShader ( shader );
-
-   // Check the compile status
-   glGetShaderiv ( shader, GL_COMPILE_STATUS, &compiled );
-
-   if ( !compiled )
-   {
-      GLint infoLen = 0;
-
-      glGetShaderiv ( shader, GL_INFO_LOG_LENGTH, &infoLen );
-
-      if ( infoLen > 1 )
-      {
-         char *infoLog = new char[infoLen];
-
-         glGetShaderInfoLog ( shader, infoLen, NULL, infoLog );
-         esLogMessage ( "Error compiling shader:\n%s\n", infoLog );
-
-		 delete[] infoLog;
-      }
-
-      glDeleteShader ( shader );
-      return 0;
-   }
-
-   return shader;
-
-}
 
 ///
 // Initialize the shader and program object
 //
 int Init ( ESContext *esContext )
 {
-    {
-        GLint maxVertexAttribs;
-        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
-        std::cout << "maxVertexAttribs:" << maxVertexAttribs << std::endl;
-    }
-
+    
    UserData *userData = (UserData *)esContext->userData;
 
    //
@@ -126,28 +76,25 @@ int Init ( ESContext *esContext )
    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
    for (int i=0; i < STAR_CNT;i++)
    {
-       userData->stars.push_back(std::make_shared<SixPointedStar>(0.4f, 1.0f, -1.0f * i));
+       userData->cube = std::make_shared<Cube>();
    }
 
    //打开深度检测
    glEnable(GL_DEPTH_TEST);
-   
+   glEnable(GL_CULL_FACE);
 
    //onSurfaceChanged
    //设置视口的大小及位置 
    glViewport(0, 0, WIDTH, HEIGHT);
    float  r = (float)WIDTH / HEIGHT;
    //MatrixState::setProjectOrtho(-r, r, -1, 1, 1, 10);
-   MatrixState::setProjectFrustum(-r * 0.8f, r*0.8f, -1 * 0.8f, 1 * 0.8f, 1, 50);
+   MatrixState::setProjectFrustum(-r * 0.8f, r*0.8f, -1 , 1 , 20, 100);
    MatrixState::setCamera(
-       0, 0, 6.f,
+       -16, 8, 45.f,
        0, 0, 0.f,
        0.f, 1.0f, 0.0f
    );
-
-   glViewport(0, 0, WIDTH, HEIGHT);
    
-   glEnable(GL_DEPTH_TEST);
    return TRUE;
 }
 
@@ -158,10 +105,22 @@ void Draw ( ESContext *esContext )
 {
    UserData *userData = (UserData *)esContext->userData;
    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-   for (auto star:userData->stars)
+   
    {
-       star->drawSelf();
+       MatrixState::pushMatrix();
+       MatrixState::translate(-1.5f, 0, 0);
+       userData->cube->drawSelf();
+       MatrixState::popMatrix();
    }
+
+   {
+       MatrixState::pushMatrix();
+       MatrixState::translate(1.5f, 0, 0);
+       MatrixState::rotate(30.f, 0 ,0, 1);
+       userData->cube->drawSelf();
+       MatrixState::popMatrix();
+   }
+
 }
 
 void Shutdown ( ESContext *esContext )
@@ -169,48 +128,11 @@ void Shutdown ( ESContext *esContext )
    UserData *userData = (UserData *)esContext->userData;
 
    //delete userData->star;
-   userData->stars.clear();
+   userData->cube.reset();
    delete userData;
    esContext->userData = nullptr;
 }
 
-void KeyProc(ESContext *esContext, unsigned char key, int x, int y)
-{
-    UserData *userData = (UserData *)esContext->userData;
-    if (key == 106)
-    {
-        //106 j = left
-        for (auto star: userData->stars)
-        {
-            star->incxAngle();
-        }        
-    }
-    else if (key == 108)
-    {
-        //108 l = right
-        for (auto star : userData->stars)
-        {
-            star->decxAngle();
-        }
-    }
-    else if (key == 105)
-    {
-        //105 i = up
-
-        for (auto star : userData->stars)
-        {
-            star->incyAngle();
-        }
-    }
-    else if (key == 109)
-    {
-        //109 m = down
-        for (auto star : userData->stars)
-        {
-            star->decyAngle();
-        }
-    }
-}
 
 extern "C" int esMain ( ESContext *esContext )
 {
@@ -223,7 +145,6 @@ extern "C" int esMain ( ESContext *esContext )
       return GL_FALSE;
    }
 
-   esRegisterKeyFunc(esContext, KeyProc);
    esRegisterShutdownFunc ( esContext, Shutdown );
    esRegisterDrawFunc ( esContext, Draw );
 
