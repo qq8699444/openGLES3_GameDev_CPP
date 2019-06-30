@@ -78,6 +78,10 @@ public:
         return glm::value_ptr(lightLocation);
     }
 
+    static float * getCameraLocation() {
+        return glm::value_ptr(cameraLocation);
+    }
+
 public:
 #ifdef USE_GLM
     static glm::mat4 mProjMatrix;
@@ -92,6 +96,7 @@ public:
     static glm::mat4 mMVPMatrix;
 
     static glm::vec3   lightLocation;
+    static glm::vec3   cameraLocation;
 #else
     static GLMatrix mProjMatrix;
     static GLMatrix mVMatrix;

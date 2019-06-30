@@ -8,6 +8,7 @@ glm::mat4 MatrixState::mMVPMatrix;
 glm::mat4 MatrixState::mStack[16];
 
 glm::vec3 MatrixState::lightLocation;
+glm::vec3 MatrixState::cameraLocation;
 #else
 GLMatrix MatrixState::mProjMatrix;
 GLMatrix MatrixState::mVMatrix;
@@ -148,6 +149,8 @@ void MatrixState::setCamera
     mVMatrix = glm::lookAt(glm::vec3(cx, cy, cz),
             glm::vec3(tx, ty, tz),
             glm::vec3(upx, upy, upz));
+
+    cameraLocation = glm::vec3(cx, cy, cz);
 #else
     setLookAtM
     (
