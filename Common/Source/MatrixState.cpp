@@ -95,6 +95,14 @@ void MatrixState::popMatrix()
     stackTop--;
 }
 
+const float* MatrixState::getMMatrix()
+{
+#ifdef USE_GLM
+    return glm::value_ptr(currMatrix);
+#else
+#endif
+}
+
 const float* MatrixState::getFinalMatrix()
 {
 #ifdef USE_GLM

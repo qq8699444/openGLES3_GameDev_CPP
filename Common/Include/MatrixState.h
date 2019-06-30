@@ -32,7 +32,7 @@ public:
     static void testglm();
     //
     static const float* getFinalMatrix();
-
+    static const float* getMMatrix();
     //
     
 
