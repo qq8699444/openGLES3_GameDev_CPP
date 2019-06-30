@@ -82,6 +82,11 @@ public:
         return glm::value_ptr(cameraLocation);
     }
 
+    static void setLightDirection(float x, float y, float z);
+    static float * getLightDirection() {
+        return glm::value_ptr(lightDirection);
+    }
+
 public:
 #ifdef USE_GLM
     static glm::mat4 mProjMatrix;
@@ -97,6 +102,7 @@ public:
 
     static glm::vec3   lightLocation;
     static glm::vec3   cameraLocation;
+    static glm::vec3   lightDirection;
 #else
     static GLMatrix mProjMatrix;
     static GLMatrix mVMatrix;

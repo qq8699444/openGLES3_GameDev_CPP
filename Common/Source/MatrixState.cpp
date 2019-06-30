@@ -9,6 +9,7 @@ glm::mat4 MatrixState::mStack[16];
 
 glm::vec3 MatrixState::lightLocation;
 glm::vec3 MatrixState::cameraLocation;
+glm::vec3 MatrixState::lightDirection;
 #else
 GLMatrix MatrixState::mProjMatrix;
 GLMatrix MatrixState::mVMatrix;
@@ -216,6 +217,12 @@ void MatrixState::setLightLocation(float x, float y, float z)
 {
     lightLocation = glm::vec3(x, y, z);
 }
+
+void MatrixState::setLightDirection(float x, float y, float z)
+{
+    lightDirection = glm::vec3(x, y, z);
+}
+
 void MatrixState::testglm()
 {
     //glm::mat4 m1 = glm::ortho(3.0f, 5.0f, 1.0f, 3.0f, 3.0f, 7.0f);
