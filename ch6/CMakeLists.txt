@@ -1,8 +1,16 @@
 #指定生成目标
 add_executable(ch6 ch6.cpp)
 add_executable(vao vao.cpp)
+add_executable(Sample6_1 Sample6_1.cpp)
+add_executable(Sample6_2 Sample6_2.cpp)
+add_executable(Sample6_3 Sample6_3.cpp)
+
 
 #链接共享库
 target_link_libraries(ch6 Common )
 target_link_libraries(vao Common )
+target_link_libraries(Sample6_1 Common )
+target_link_libraries(Sample6_2 Common )
+target_link_libraries(Sample6_3 Common )
+
 

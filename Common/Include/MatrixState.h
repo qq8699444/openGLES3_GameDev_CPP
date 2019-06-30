@@ -73,6 +73,10 @@ public:
         float upz //摄像机UP向量Z分量  
     );
     
+    static void setLightLocation(float x, float y, float z);
+    static float * getLightLocation() {
+        return glm::value_ptr(lightLocation);
+    }
 
 public:
 #ifdef USE_GLM
@@ -86,6 +90,8 @@ public:
 
     //
     static glm::mat4 mMVPMatrix;
+
+    static glm::vec3   lightLocation;
 #else
     static GLMatrix mProjMatrix;
     static GLMatrix mVMatrix;
