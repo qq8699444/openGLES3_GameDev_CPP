@@ -32,6 +32,17 @@ target_link_libraries(Sample5_16 Common )
 
 set(CMAKE_MSVCIDE_RUN_PATH ${PROJECT_SOURCE_DIR}/../Mali_OpenGL_ES_Emulator/)
 
-
-
-
+set_target_properties(Sample5_1 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_2 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_3 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_4 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_5 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_6 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_7 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_8 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_9 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_10 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_12 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_13 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_14 PROPERTIES FOLDER "chapter5") 
+set_target_properties(Sample5_16 PROPERTIES FOLDER "chapter5") 

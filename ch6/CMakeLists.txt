@@ -1,6 +1,5 @@
 #指定生成目标
-add_executable(ch6 ch6.cpp)
-add_executable(vao vao.cpp)
+
 add_executable(Sample6_1 Sample6_1.cpp)
 add_executable(Sample6_2 Sample6_2.cpp)
 add_executable(Sample6_3 Sample6_3.cpp)
@@ -11,8 +10,7 @@ add_executable(Sample6_7 Sample6_7.cpp)
 add_executable(Sample6_8 Sample6_8.cpp)
 add_executable(Sample6_9 Sample6_9.cpp)
 #链接共享库
-target_link_libraries(ch6 Common )
-target_link_libraries(vao Common )
+
 target_link_libraries(Sample6_1 Common )
 target_link_libraries(Sample6_2 Common )
 target_link_libraries(Sample6_3 Common )
@@ -23,3 +21,12 @@ target_link_libraries(Sample6_7 Common )
 target_link_libraries(Sample6_8 Common )
 target_link_libraries(Sample6_9 Common )
 
+set_target_properties(Sample6_1 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_2 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_3 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_4 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_5 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_6 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_7 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_8 PROPERTIES FOLDER "chapter6") 
+set_target_properties(Sample6_9 PROPERTIES FOLDER "chapter6") 
