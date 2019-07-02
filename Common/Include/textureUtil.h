@@ -4,7 +4,14 @@
 class TextureUtil
 {
 public:
-    static GLuint load(const std::string imgfile)
+    enum 
+    {
+        Stretch_Mode_None,
+        Stretch_Mode_Repeat,
+        Stretch_Mode_Clamp_to_Edge,
+        Stretch_Mode_Mirror_Repeat,
+    };
+    static GLuint load(const std::string imgfile, int strtchmode = Stretch_Mode_None)
     {
         HRESULT hResult;
         CImage img;
@@ -25,6 +32,32 @@ public:
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            if (strtchmode == Stretch_Mode_Repeat)
+            {
+                glTexParameterf(GL_TEXTURE_2D, //S轴为重复拉伸方式
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+                glTexParameterf(GL_TEXTURE_2D, //T轴为重复拉伸方式
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+            }
+            else if (strtchmode == Stretch_Mode_Clamp_to_Edge)
+            {
+                glTexParameterf(GL_TEXTURE_2D, //S轴为截取拉伸方式
+                    GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, //T轴为截取拉伸方式
+                    GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            }
+            else if (strtchmode == Stretch_Mode_Mirror_Repeat)
+            {
+                glTexParameterf(GL_TEXTURE_2D, //S轴为镜像重复拉伸方式
+                    GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+                glTexParameterf(GL_TEXTURE_2D, //T轴为镜像重复拉伸方式
+                    GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+            }
+            else
+            {
+
+            }
+            //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_GREEN);
 
             GLubyte* data = new GLubyte[img.GetWidth() * img.GetHeight() * 3];
             for (int y = 0; y < img.GetHeight(); y++)
