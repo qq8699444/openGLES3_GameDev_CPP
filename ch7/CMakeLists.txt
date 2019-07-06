@@ -25,3 +25,7 @@ add_executable(Sample7_7 Sample7_7.cpp)
 target_link_libraries(Sample7_7 Common )
 set_target_properties(Sample7_7 PROPERTIES FOLDER "chapter7") 
 
+add_executable(Sample7_9 Sample7_9.cpp)
+target_link_libraries(Sample7_9 Common )
+set_target_properties(Sample7_9 PROPERTIES FOLDER "chapter7") 
+
